@@ -72,3 +72,30 @@ def ask(formula_str: str) -> str:
     # 3) otherwise we can’t decide
     return "I do not know"
 
+def list_kb() -> str:
+    """
+    Implements the `list_kb` (or `list kb`) command.
+    Returns a numbered list of all formulas in the KB,
+    e.g.,
+      1. p => q
+      2. p
+      3. r & s
+    """
+    if not knowledge_base:
+        return "Knowledge base is empty."
+
+    lines = []
+    for i, expr in enumerate(knowledge_base, start=1):
+        # special‐case the two‐argument operators for nicer infix
+        if expr.func is Implies:
+            a, b = expr.args
+            rep = f"{a} => {b}"
+        elif expr.func is Equivalent:
+            a, b = expr.args
+            rep = f"{a} <=> {b}"
+        else:
+            # default sympy pretty‐printing for And, Or, Not, etc.
+            rep = str(expr)
+        lines.append(f"{i}. {rep}")
+
+    return "\n".join(lines)
