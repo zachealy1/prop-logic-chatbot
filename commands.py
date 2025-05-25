@@ -1,6 +1,5 @@
 from sympy.logic.boolalg import And, Or, Not
 from sympy.logic.inference import satisfiable
-from sympy.parsing.sympy_parser import parse_expr
 from sympy import Implies, Equivalent
 from sympy import to_cnf as sympy_to_cnf
 from logic_chatbot import knowledge_base, parse_formula
