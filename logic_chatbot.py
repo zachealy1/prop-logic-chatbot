@@ -105,18 +105,18 @@ def modus_ponens(premise_str: str, implication_str: str) -> str:
     modus_ponens: <premise>; <implication>
     e.g. modus_ponens("p", "p implies q") -> "applied modus ponens and learned: q"
     """
-    φ = parse_formula(premise_str)
-    ψ = parse_formula(implication_str)
+    p = parse_formula(premise_str)
+    q = parse_formula(implication_str)
 
-    # ensure ψ is an implication
-    if ψ.func is not Implies:
+    # ensure q is an implication
+    if q.func is not Implies:
         return "Error: second argument must be an implication."
 
-    antecedent, consequent = ψ.args
+    antecedent, consequent = q.args
 
     # ensure the premise matches the antecedent
-    if φ != antecedent:
-        return f"Error: premise {φ!s} does not match implication antecedent {antecedent!s}."
+    if p != antecedent:
+        return f"Error: premise {p!s} does not match implication antecedent {antecedent!s}."
 
     # now learn the consequent
     res = tell(str(consequent))
@@ -131,27 +131,27 @@ def modus_ponens(premise_str: str, implication_str: str) -> str:
 def resolution(clause1_str: str, clause2_str: str) -> str:
     """
     resolution: <clause1>; <clause2>
-    e.g. resolution("p or r", "not p or s") -> "applied resolution and learned: r | s"
+    e.g., resolution("p or r", "not p or s") -> "applied resolution and learned: r | s"
     """
-    C1 = parse_formula(clause1_str)
-    C2 = parse_formula(clause2_str)
+    c1 = parse_formula(clause1_str)
+    c2 = parse_formula(clause2_str)
 
     # helper: extract the list of literals from a clause
     def literals(cl):
         return list(cl.args) if cl.func is Or else [cl]
 
-    lits1 = literals(C1)
-    lits2 = literals(C2)
+    lits1 = literals(c1)
+    lits2 = literals(c2)
 
     # look for a complementary pair
-    for ℓ1 in lits1:
-        for ℓ2 in lits2:
-            if ℓ1 == Not(ℓ2) or Not(ℓ1) == ℓ2:
-                # remove ℓ1 and ℓ2, then union the rest
-                new_lits = [x for x in lits1 if x != ℓ1] + [x for x in lits2 if x != ℓ2]
+    for e1 in lits1:
+        for e2 in lits2:
+            if e1 == Not(e2) or Not(e1) == e2:
+                # remove e1 and e2, then union the rest
+                new_list = [x for x in lits1 if x != e1] + [x for x in lits2 if x != e2]
                 # dedupe
                 uniq = []
-                for x in new_lits:
+                for x in new_list:
                     if x not in uniq:
                         uniq.append(x)
                 # build the resolvent
