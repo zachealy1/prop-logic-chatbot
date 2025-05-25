@@ -2,7 +2,7 @@ from sympy.logic.boolalg import And, Or, Not
 from sympy.parsing.sympy_parser import parse_expr
 from sympy import Implies, Equivalent
 
-from commands import ask, tell, list_kb, modus_ponens, resolution, to_cnf
+from commands import ask, tell, list_kb, modus_ponens, resolution, convert_to_cnf
 
 # our global knowledge base: a list of Sympy expressions
 knowledge_base = []
@@ -68,10 +68,10 @@ def handle_message(message: str):
         c1, c2 = parts[0].strip(), parts[1].strip()
         return resolution(c1, c2)
 
-    # to_cnf: <formula>
-    if msg.startswith('to_cnf:'):
-        formula = msg[len('to_cnf:'):].strip()
-        return to_cnf(formula)
+    # convert_to_cnf: <formula>
+    if msg.startswith('convert_to_cnf:'):
+        formula = msg[len('convert_to_cnf:'):].strip()
+        return convert_to_cnf(formula)
 
     # nothing matched
     return "Unknown command. Please use tell:, ask:, list_kb, modus_ponens:, resolution:, to_cnf: or exit."

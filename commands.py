@@ -4,7 +4,6 @@ from sympy import Implies, Equivalent
 from sympy import to_cnf as sympy_to_cnf
 from logic_chatbot import knowledge_base, parse_formula
 
-
 def tell(formula_str: str) -> str:
     """
     Implements the `tell:` command.
@@ -156,7 +155,7 @@ def resolution(clause1_str: str, clause2_str: str) -> str:
 
     return "No complementary literals found; resolution not applicable."
 
-def to_cnf(formula_str: str) -> str:
+def convert_to_cnf(formula_str: str) -> str:
     """
     Implements the `to_cnf:` command.
     Returns two lines:
