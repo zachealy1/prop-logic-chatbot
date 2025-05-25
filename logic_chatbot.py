@@ -1,4 +1,3 @@
-from sympy import sympify
 from sympy.logic.boolalg import And, Or, Not
 from sympy.logic.inference import satisfiable
 from sympy.parsing.sympy_parser import parse_expr
@@ -47,4 +46,29 @@ def tell(formula_str: str) -> str:
     # 3) otherwise it’s new and consistent
     knowledge_base.append(p)
     return "I've learned something new"
+
+def ask(formula_str: str) -> str:
+    """
+    Implements the `ask:` command.
+    Returns:
+      - "Yes" if the KB entails the formula
+      - "No" if the formula contradicts the KB
+      - "I do not know" otherwise
+    """
+    # parse the user’s input into a Sympy expression
+    p = parse_formula(formula_str)
+
+    # build a single conjunction of all known facts (True if KB is empty)
+    kb_conj = And(*knowledge_base) if knowledge_base else True
+
+    # 1) KB entails p  <=>  KB ∧ ¬p is unsatisfiable
+    if not satisfiable(And(kb_conj, Not(p))):
+        return "Yes"
+
+    # 2) p contradicts KB  <=>  KB ∧ p is unsatisfiable
+    if not satisfiable(And(kb_conj, p)):
+        return "No"
+
+    # 3) otherwise we can’t decide
+    return "I do not know"
 
