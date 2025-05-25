@@ -2,6 +2,7 @@ from sympy.logic.boolalg import And, Or, Not
 from sympy.logic.inference import satisfiable
 from sympy.parsing.sympy_parser import parse_expr
 from sympy import Implies, Equivalent
+from sympy import to_cnf as sympy_to_cnf
 
 # our global knowledge base: a list of Sympy expressions
 knowledge_base = []
@@ -172,3 +173,20 @@ def resolution(clause1_str: str, clause2_str: str) -> str:
                     return f"I do not believe that: {resolvent}"
 
     return "No complementary literals found; resolution not applicable."
+
+def to_cnf(formula_str: str) -> str:
+    """
+    Implements the `to_cnf:` command.
+    Returns two lines:
+      original formula: <parsed>
+      converted to CNF: <cnf form>
+    """
+    # 1. parse the user’s input into a Sympy expression
+    p = parse_formula(formula_str)
+
+    # 2. convert it into conjunctive normal form
+    #    simplify=True applies basic simplifications like flattening
+    cnf_form = sympy_to_cnf(p, simplify=True)
+
+    # 3. format the two‐line response
+    return f"original formula: {p}\nconverted to CNF: {cnf_form}"
