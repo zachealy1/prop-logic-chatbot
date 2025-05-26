@@ -263,19 +263,19 @@ def truth_table(formula_str: str) -> str:
     """
     p = parse_formula(formula_str)
     # get the propositional symbols, sorted by name for consistency
-    vars = sorted(p.free_symbols, key=lambda s: s.name)
+    symbols = sorted(p.free_symbols, key=lambda s: s.name)
 
     # build header row
-    header = " | ".join(str(v) for v in vars + [p])
+    header = " | ".join(str(v) for v in symbols + [p])
     lines = [header]
 
     # iterate over all 2^n assignments
-    for assignment in itertools.product([False, True], repeat=len(vars)):
-        env = dict(zip(vars, assignment))
+    for assignment in itertools.product([False, True], repeat=len(symbols)):
+        env = dict(zip(symbols, assignment))
         # evaluate p under this assignment
         val = bool(p.subs(env))
         # build one row: 0/1 for each var, then for p
-        row = " | ".join(str(int(env[v])) for v in vars) + " | " + str(int(val))
+        row = " | ".join(str(int(env[v])) for v in symbols) + " | " + str(int(val))
         lines.append(row)
 
     return "\n".join(lines)
