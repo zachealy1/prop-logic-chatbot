@@ -61,3 +61,34 @@ Error: premise r does not match implication antecedent p.
 Error: second argument must be an implication.
 > exit
 Goodbye!
+
+-------resolution-------
+$ python main.py
+Logic Chatbot
+Type 'exit' to quit
+> tell: p or r
+I've learned something new
+> tell: not p or s
+I've learned something new
+> resolution: p or r; not p or s
+applied resolution and learned: r | s
+> list_kb
+1. p | r
+2. ~p | s
+3. r | s
+> resolution: p or q; r or s
+No complementary literals found; resolution not applicable.
+> tell: p
+I've learned something new
+> tell: not p
+I do not believe that
+> resolution: p; not p
+applied resolution and learned: False
+> list_kb
+1. p | r
+2. s | ~p
+3. r | s
+4. p
+5. False
+> exit
+Goodbye!

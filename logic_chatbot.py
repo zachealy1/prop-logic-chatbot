@@ -2,7 +2,7 @@ import re
 import itertools
 from sympy.logic.inference import satisfiable
 from sympy import to_cnf as sympy_to_cnf
-from sympy.logic.boolalg import And, Or, Not
+from sympy.logic.boolalg import And, Or, Not, false
 from sympy.parsing.sympy_parser import parse_expr
 from sympy import Implies, Equivalent
 
@@ -204,40 +204,38 @@ def resolution(clause1_str: str, clause2_str: str) -> str:
     c1 = parse_formula(clause1_str)
     c2 = parse_formula(clause2_str)
 
-    # helper: extract the list of literals from a clause
     def literals(cl):
         return list(cl.args) if cl.func is Or else [cl]
 
     lits1 = literals(c1)
     lits2 = literals(c2)
 
-    # look for a complementary pair
     for e1 in lits1:
         for e2 in lits2:
             if e1 == Not(e2) or Not(e1) == e2:
-                # remove e1 and e2, then union the rest
+                # form the union of the remaining literals
                 new_list = [x for x in lits1 if x != e1] + [x for x in lits2 if x != e2]
-                # dedupe
+
+                # dedupe while preserving order
                 uniq = []
                 for x in new_list:
                     if x not in uniq:
                         uniq.append(x)
-                # build the resolvent
+
+                # build the resolvent clause, using Sympy's false for the empty clause
                 if not uniq:
-                    resolvent = False  # the empty clause
+                    resolvent = false
                 elif len(uniq) == 1:
                     resolvent = uniq[0]
                 else:
                     resolvent = Or(*uniq)
 
-                # delegate to tell(...) to handle KB insertion
-                res = tell(str(resolvent))
-                if res == "I've learned something new":
+                # direct syntactic insert
+                if resolvent not in knowledge_base:
+                    knowledge_base.append(resolvent)
                     return f"applied resolution and learned: {resolvent}"
-                elif res == "I already know that":
-                    return f"applied resolution but I already know that: {resolvent}"
                 else:
-                    return f"I do not believe that: {resolvent}"
+                    return f"applied resolution but it's already in the KB: {resolvent}"
 
     return "No complementary literals found; resolution not applicable."
 
