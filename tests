@@ -1,4 +1,4 @@
-Tell
+-------Tell-------
 Logic Chatbot
 Type 'exit' to quit
 > tell: p implies q
@@ -9,5 +9,36 @@ I already know that
 I've learned something new
 > tell: not p
 I do not believe that
+> exit
+Goodbye!
+
+-------Ask-------
+Logic Chatbot
+Type 'exit' to quit
+> tell: p implies q
+I've learned something new
+> tell: p
+I've learned something new
+> ask: q
+Yes
+> ask: not p
+No
+> ask: r
+I do not know
+> exit
+Goodbye!
+
+-------list_kb-------
+Logic Chatbot
+Type 'exit' to quit
+> list_kb
+Knowledge base is empty.
+> tell: p implies q
+I've learned something new
+> tell: p
+I've learned something new
+> list_kb
+1. p => q
+2. p
 > exit
 Goodbye!
