@@ -312,29 +312,27 @@ def convert_to_cnf(formula_str: str) -> str:
 
 def truth_table(formula_str: str) -> str:
     """
-    Generate a truth table for the propositional formula.
-    Returns a multi‐line string like:
-
-      p | q | p & q
-      0 | 0 | 0
-      0 | 1 | 0
-      1 | 0 | 0
-      1 | 1 | 1
+    Generate a truth table for the propositional formula, formatting the
+    formula itself with format_formula for consistent spacing and operators.
     """
     p = parse_formula(formula_str)
-    # get the propositional symbols, sorted by name for consistency
+    # get the propositional symbols, sorted by name
     symbols = sorted(p.free_symbols, key=lambda s: s.name)
 
-    # build header row
-    header = " | ".join(str(v) for v in symbols + [p])
+    # format the full formula once
+    fmt_formula = format_formula(p)
+
+    # build header: each variable, then the nicely formatted formula
+    header_cells = [str(v) for v in symbols] + [fmt_formula]
+    header = " | ".join(header_cells)
+
     lines = [header]
 
     # iterate over all 2^n assignments
     for assignment in itertools.product([False, True], repeat=len(symbols)):
         env = dict(zip(symbols, assignment))
-        # evaluate p under this assignment
         val = bool(p.subs(env))
-        # build one row: 0/1 for each var, then for p
+        # row: 0/1 for each var, then for the formula
         row = " | ".join(str(int(env[v])) for v in symbols) + " | " + str(int(val))
         lines.append(row)
 

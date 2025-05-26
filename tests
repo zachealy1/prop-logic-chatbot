@@ -111,3 +111,28 @@ original formula : ~p & ( q | ~r )
 converted to CNF : ( r | ~p ) & ( ~p | ~q )
 > exit
 Goodbye!
+
+-------truth_table-------
+$ python main.py
+Logic Chatbot
+Type 'exit' to quit
+> truth_table: p and q
+p | q | p & q
+0 | 0 | 0
+0 | 1 | 0
+1 | 0 | 0
+1 | 1 | 1
+> truth_table: p implies q
+p | q | p => q
+0 | 0 | 1
+0 | 1 | 1
+1 | 0 | 0
+1 | 1 | 1
+> truth_table: p iff q
+p | q | p <=> q
+0 | 0 | 1
+0 | 1 | 0
+1 | 0 | 0
+1 | 1 | 1
+> exit
+Goodbye!
