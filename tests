@@ -42,3 +42,22 @@ I've learned something new
 2. p
 > exit
 Goodbye!
+
+
+-------modus_ponens-------
+$ python main.py
+Logic Chatbot
+Type 'exit' to quit
+> tell: p implies q
+I've learned something new
+> modus_ponens: p; p implies q
+applied modus ponens and learned: q
+> list_kb
+1. p => q
+3. q
+> modus_ponens: r; p implies q
+Error: premise r does not match implication antecedent p.
+> modus_ponens: p; p and q
+Error: second argument must be an implication.
+> exit
+Goodbye!
