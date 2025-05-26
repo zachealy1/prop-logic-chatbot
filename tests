@@ -92,3 +92,22 @@ applied resolution and learned: False
 5. False
 > exit
 Goodbye!
+
+-------to_cnf-------
+$ python main.py
+Logic Chatbot
+Type 'exit' to quit
+> to_cnf: p implies (q and r)
+original formula : p => ( q & r )
+converted to CNF : ( q | ~p ) & ( r | ~p )
+> to_cnf: (p or q) implies (r and s)
+original formula : p | q => ( r & s )
+converted to CNF : ( r | ~p ) & ( r | ~q ) & ( s | ~p ) & ( s | ~q )
+> to_cnf: p iff q
+original formula : p <=> q
+converted to CNF : ( p | ~q ) & ( q | ~p )
+> to_cnf: not (p and (q or not r))
+original formula : ~p & ( q | ~r )
+converted to CNF : ( r | ~p ) & ( ~p | ~q )
+> exit
+Goodbye!

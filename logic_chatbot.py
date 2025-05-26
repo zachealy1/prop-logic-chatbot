@@ -32,6 +32,57 @@ def parse_formula(text: str):
         local_dict={ 'Implies': Implies, 'Equivalent': Equivalent }
     )
 
+def format_formula(expr) -> str:
+    """
+    Recursively turn a Sympy BoolExpr into a nicely spaced infix string:
+      - uses => for Implies, <=> for Equivalent
+      - & for And, | for Or
+      - ~ for Not (unary), with a space before.
+      - wraps non-atomic args in parentheses with spaces.
+    """
+    # atomic symbol
+    if expr.is_Symbol:
+        return expr.name
+
+    # negation
+    if expr.func is Not:
+        inner = format_formula(expr.args[0])
+        # if inner is compound, keep its parentheses
+        return f"~{inner}"
+
+    # binary connectors
+    if expr.func is Implies:
+        a, b = expr.args
+        left = format_formula(a)
+        right = format_formula(b)
+        # wrap right in parens if it's compound
+        if not b.is_Symbol and b.func is not Not:
+            right = f"( {right} )"
+        return f"{left} => {right}"
+
+    if expr.func is Equivalent:
+        a, b = expr.args
+        left = format_formula(a)
+        right = format_formula(b)
+        if not b.is_Symbol and b.func is not Not:
+            right = f"( {right} )"
+        return f"{left} <=> {right}"
+
+    if expr.func is And or expr.func is Or:
+        op = " & " if expr.func is And else " | "
+        parts = []
+        for arg in expr.args:
+            s = format_formula(arg)
+            # if the arg is itself an And/Or of multiple terms, or an implication, wrap it
+            if arg.func in (And, Or, Implies, Equivalent) and len(arg.args) > 1:
+                parts.append(f"( {s} )")
+            else:
+                parts.append(s)
+        return op.join(parts)
+
+    # fallback
+    return str(expr)
+
 def handle_message(message: str):
     """
     Parse a single line of user input and call the appropriate chatbot function.
@@ -83,8 +134,8 @@ def handle_message(message: str):
         return resolution(c1, c2)
 
     # convert_to_cnf: <formula>
-    if msg.startswith('convert_to_cnf:'):
-        formula = msg[len('convert_to_cnf:'):].strip()
+    if msg.startswith('to_cnf:'):
+        formula = msg[len('to_cnf:'):].strip()
         return convert_to_cnf(formula)
 
     # nothing matched
@@ -253,8 +304,11 @@ def convert_to_cnf(formula_str: str) -> str:
     #    simplify=True applies basic simplifications like flattening
     cnf_form = sympy_to_cnf(p, simplify=True)
 
+    orig_str = format_formula(p)
+    cnf_str = format_formula(cnf_form)
+
     # 3. format the two‐line response
-    return f"original formula: {p}\nconverted to CNF: {cnf_form}"
+    return f"original formula : {orig_str}\nconverted to CNF : {cnf_str}"
 
 def truth_table(formula_str: str) -> str:
     """
