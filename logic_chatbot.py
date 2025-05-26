@@ -6,8 +6,9 @@ from sympy.logic.boolalg import And, Or, Not, false
 from sympy.parsing.sympy_parser import parse_expr
 from sympy import Implies, Equivalent
 
-# our global knowledge base: a list of Sympy expressions
+# the global knowledge base: a list of Sympy expressions
 knowledge_base = []
+
 
 def parse_formula(text: str):
     """
@@ -17,10 +18,10 @@ def parse_formula(text: str):
     t = text.strip()
 
     # map infix keywords to symbols/operators
-    t = re.sub(r'\bimplies\b',    '>>',  t)
-    t = re.sub(r'\band\b',        '&',   t)
-    t = re.sub(r'\bor\b',         '|',   t)
-    t = re.sub(r'\bnot\s+',       '~',   t)
+    t = re.sub(r'\bimplies\b', '>>', t)
+    t = re.sub(r'\band\b', '&', t)
+    t = re.sub(r'\bor\b', '|', t)
+    t = re.sub(r'\bnot\s+', '~', t)
 
     # handle “iff” by turning it into an Explicit call
     if 'iff' in t:
@@ -29,8 +30,9 @@ def parse_formula(text: str):
     # now parse a valid Python expression
     return parse_expr(
         t,
-        local_dict={ 'Implies': Implies, 'Equivalent': Equivalent }
+        local_dict={'Implies': Implies, 'Equivalent': Equivalent}
     )
+
 
 def format_formula(expr) -> str:
     """
@@ -82,6 +84,7 @@ def format_formula(expr) -> str:
 
     # fallback
     return str(expr)
+
 
 def handle_message(message: str):
     """
@@ -141,30 +144,37 @@ def handle_message(message: str):
     # nothing matched
     return "Unknown command. Please use tell:, ask:, list_kb, modus_ponens:, resolution:, to_cnf: or exit."
 
+
 def tell(formula_str: str) -> str:
     """
-    Implements the `tell:` command.
+    Process a new statement for the knowledge base.
+
+    Args:
+        formula_str: A string representation of a logical formula.
+
     Returns:
-     - "I already know that"
-     - "I do not believe that"
-     - "I've learned something new"
+        - "I already know that" if the formula follows from what’s already stored.
+        - "I do not believe that" if adding the formula would create a contradiction.
+        - "I've learned something new" if the formula is both novel and consistent.
     """
+    # Parse the input text into our internal formula object
     p = parse_formula(formula_str)
-    # make a single conjunction of everything in the KB (True if empty)
+
+    # Build one big conjunction of everything.
     kb_conj = And(*knowledge_base) if knowledge_base else True
 
-    # 1) already entails p?
-    #    KB entails p  <=>  KB ∧ ¬p is unsatisfiable
+    # Check if the new formula is already a logical consequence
     if not satisfiable(And(kb_conj, Not(p))):
         return "I already know that"
 
-    # 2) would contradict: KB ∧ p unsatisfiable?
+    # Check for inconsistency if it is added
     if not satisfiable(And(kb_conj, p)):
         return "I do not believe that"
 
-    # 3) otherwise it’s new and consistent
+    # Otherwise, it’s a new, non-contradictory fact—add to KB
     knowledge_base.append(p)
     return "I've learned something new"
+
 
 def ask(formula_str: str) -> str:
     """
@@ -180,16 +190,17 @@ def ask(formula_str: str) -> str:
     # build a single conjunction of all known facts (True if KB is empty)
     kb_conj = And(*knowledge_base) if knowledge_base else True
 
-    # 1) KB entails p  <=>  KB ∧ ¬p is unsatisfiable
+    # KB entails p  <=>  KB ∧ ¬p is unsatisfiable
     if not satisfiable(And(kb_conj, Not(p))):
         return "Yes"
 
-    # 2) p contradicts KB  <=>  KB ∧ p is unsatisfiable
+    # contradicts KB  <=>  KB ∧ p is unsatisfiable
     if not satisfiable(And(kb_conj, p)):
         return "No"
 
-    # 3) otherwise we can’t decide
+    # otherwise it can’t be decided
     return "I do not know"
+
 
 def list_kb() -> str:
     """
@@ -218,6 +229,7 @@ def list_kb() -> str:
         lines.append(f"{i}. {rep}")
 
     return "\n".join(lines)
+
 
 def modus_ponens(premise_str: str, implication_str: str) -> str:
     """
@@ -290,6 +302,7 @@ def resolution(clause1_str: str, clause2_str: str) -> str:
 
     return "No complementary literals found; resolution not applicable."
 
+
 def convert_to_cnf(formula_str: str) -> str:
     """
     Implements the `to_cnf:` command.
@@ -297,18 +310,19 @@ def convert_to_cnf(formula_str: str) -> str:
       original formula: <parsed>
       converted to CNF: <cnf form>
     """
-    # 1. parse the user’s input into a Sympy expression
+    # parse the user’s input into a Sympy expression
     p = parse_formula(formula_str)
 
-    # 2. convert it into conjunctive normal form
-    #    simplify=True applies basic simplifications like flattening
+    # convert it into conjunctive normal form
+    # simplify=True applies basic simplifications like flattening
     cnf_form = sympy_to_cnf(p, simplify=True)
 
     orig_str = format_formula(p)
     cnf_str = format_formula(cnf_form)
 
-    # 3. format the two‐line response
+    # format the two‐line response
     return f"original formula : {orig_str}\nconverted to CNF : {cnf_str}"
+
 
 def truth_table(formula_str: str) -> str:
     """
