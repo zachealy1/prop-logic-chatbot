@@ -1,3 +1,4 @@
+import re
 import itertools
 from sympy.logic.inference import satisfiable
 from sympy import to_cnf as sympy_to_cnf
@@ -13,15 +14,22 @@ def parse_formula(text: str):
     Parse a propositional‐logic string into a Sympy Boolean expression,
     mapping our keywords to the right Sympy constructors.
     """
+    t = text.strip()
+
+    # map infix keywords to symbols/operators
+    t = re.sub(r'\bimplies\b',    '>>',  t)
+    t = re.sub(r'\band\b',        '&',   t)
+    t = re.sub(r'\bor\b',         '|',   t)
+    t = re.sub(r'\bnot\s+',       '~',   t)
+
+    # handle “iff” by turning it into an Explicit call
+    if 'iff' in t:
+        left, right = t.split('iff', 1)
+        t = f"Equivalent({left.strip()}, {right.strip()})"
+    # now parse a valid Python expression
     return parse_expr(
-        text,
-        local_dict={
-            'and':     And,
-            'or':      Or,
-            'not':     Not,
-            'implies': Implies,
-            'iff':     Equivalent
-        }
+        t,
+        local_dict={ 'Implies': Implies, 'Equivalent': Equivalent }
     )
 
 def handle_message(message: str):

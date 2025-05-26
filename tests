@@ -1,0 +1,13 @@
+Tell
+Logic Chatbot
+Type 'exit' to quit
+> tell: p implies q
+I've learned something new
+> tell: p implies q
+I already know that
+> tell: p
+I've learned something new
+> tell: not p
+I do not believe that
+> exit
+Goodbye!
