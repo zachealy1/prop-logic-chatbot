@@ -147,7 +147,9 @@ def handle_message(message: str):
 
 def tell(formula_str: str) -> str:
     """
-    Process a new statement for the knowledge base.
+    Process a new statement for the knowledge base
+    and immediately draw any obvious consequences
+    using Modus Ponens and Resolution.
 
     Args:
         formula_str: A string representation of a logical formula.
@@ -155,50 +157,77 @@ def tell(formula_str: str) -> str:
     Returns:
         - "I already know that" if the formula follows from what’s already stored.
         - "I do not believe that" if adding the formula would create a contradiction.
-        - "I've learned something new" if the formula is both novel and consistent.
+        - "I've learned something new" if the formula is novel and consistent.
     """
-    # Parse the input text into our internal formula object
+    # turn the user’s text into a Sympy formula
     p = parse_formula(formula_str)
 
-    # Build one big conjunction of everything.
+    # bundle up everything we believe so far (True if nothing in KB)
     kb_conj = And(*knowledge_base) if knowledge_base else True
 
-    # Check if the new formula is already a logical consequence
+    # if KB already entails it, no need to add
     if not satisfiable(And(kb_conj, Not(p))):
         return "I already know that"
 
-    # Check for inconsistency if it is added
+    # if it clashes with what we’ve got, reject it
     if not satisfiable(And(kb_conj, p)):
         return "I do not believe that"
 
-    # Otherwise, it’s a new, non-contradictory fact—add to KB
+    # otherwise, accept the new fact
     knowledge_base.append(p)
+
+    # --- forward chaining: look for any immediate Modus Ponens inferences ---
+    for imp in list(knowledge_base):
+        if imp.func is Implies:
+            ante, cons = imp.args
+            # if we’ve just added the antecedent, we can learn the consequent
+            if p == ante:
+                _ = modus_ponens(formula_str, str(imp))
+
+    # --- resolution with the new clause against all others ---
+    for clause in list(knowledge_base):
+        _ = resolution(formula_str, str(clause))
+        _ = resolution(str(clause), formula_str)
+
     return "I've learned something new"
 
 
 def ask(formula_str: str) -> str:
     """
-    Implements the `ask:` command.
+    Answer a query by checking the KB directly
+    and by trying Modus Ponens or a one–step resolution refutation.
+
     Returns:
-      - "Yes" if the KB entails the formula
-      - "No" if the formula contradicts the KB
+      - "Yes" if we can derive the formula
+      - "No" if it contradicts what we believe
       - "I do not know" otherwise
     """
-    # parse the user’s input into a Sympy expression
     p = parse_formula(formula_str)
-
-    # build a single conjunction of all known facts (True if KB is empty)
     kb_conj = And(*knowledge_base) if knowledge_base else True
 
-    # KB entails p  <=>  KB ∧ ¬p is unsatisfiable
-    if not satisfiable(And(kb_conj, Not(p))):
+    # direct lookup
+    if p in knowledge_base:
         return "Yes"
 
-    # contradicts KB  <=>  KB ∧ p is unsatisfiable
+    # try Modus Ponens: do we have A->p and A holds?
+    for imp in knowledge_base:
+        if imp.func is Implies:
+            ante, cons = imp.args
+            if cons == p and not satisfiable(And(kb_conj, Not(ante))):
+                return "Yes"
+
+    # one–step resolution on ¬p against each clause
+    neg_p_str = f"¬({formula_str})"
+    for clause in knowledge_base:
+        res = resolution(neg_p_str, str(clause))
+        # if we derive the empty clause (false), KB ∪ {¬p} is inconsistent → KB ⊨ p
+        if "learned: False" in res:
+            return "Yes"
+
+    # check outright contradiction with p
     if not satisfiable(And(kb_conj, p)):
         return "No"
 
-    # otherwise it can’t be decided
     return "I do not know"
 
 
