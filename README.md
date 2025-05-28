@@ -39,7 +39,6 @@ Type 'exit' to quit
 ```
 
 ## Commands
-## Commands
 
 ### `tell: <formula>`
 Add `<formula>` to the KB if it’s new and consistent.  
