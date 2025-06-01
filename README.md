@@ -211,20 +211,11 @@ free to experiment by using `tell:` and `ask:` on either side of each equality.
     1. `p and (p or q) = p`
     2. `p or (p and q) = p`
 
-7. **Laws for Tautology (Truth)**
-    1. `p or true = true`
-    2. `p and true = p`
-    3. `p or not p = true`
-
-8. **Laws for Contradiction (Falsehood)**
-    1. `p or c = p`
-    2. `p and c = c`
-    3. `p and not p = c`
-
-9. **Implication**
+7. **Implication**
     1. `p => q = (not p) or q`
     2. `p => q = (not q) => (not p)`
     3. `not (p => q) = p and (not q)`
-
-10. **Double Implication (Biconditional)**
+   
+8. **Double Implication (Biconditional)**
     1. `p <=> q = (p => q) and (q => p)`
+
