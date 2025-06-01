@@ -123,18 +123,18 @@ Goodbye!
 $ python main.py
 Logic Chatbot
 Type 'exit' to quit
-> to_cnf: p implies (q and r)
-original formula : p => ( q & r )
-converted to CNF : ( q | ~p ) & ( r | ~p )
-> to_cnf: (p or q) implies (r and s)
-original formula : p | q => ( r & s )
-converted to CNF : ( r | ~p ) & ( r | ~q ) & ( s | ~p ) & ( s | ~q )
-> to_cnf: p iff q
-original formula : p <=> q
-converted to CNF : ( p | ~q ) & ( q | ~p )
-> to_cnf: not (p and (q or not r))
-original formula : ~p & ( q | ~r )
-converted to CNF : ( r | ~p ) & ( ~p | ~q )
+> to_cnf: r implies w
+original formula : r => w
+converted to CNF : w | ~r
+> to_cnf: (w and b) implies s
+original formula : b & w => s
+converted to CNF : s | ~b | ~w
+> to_cnf: (not r or c) implies not s
+original formula : c | ~r => ~s
+converted to CNF : ( r | ~s ) & ( ~c | ~s )
+> to_cnf: c iff not r
+original formula : c <=> ~r
+converted to CNF : ( c | r ) & ( ~c | ~r )
 > exit
 Goodbye!
 ```
