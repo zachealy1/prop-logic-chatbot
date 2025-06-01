@@ -12,26 +12,29 @@ Logic Chatbot is a simple command-line tool for working with propositional logic
 
 ## Requirements
 
-- Python 3.7 or higher  
-- [Sympy](https://www.sympy.org/)  
+- Python 3.7 or higher
+- [Sympy](https://www.sympy.org/)
 
 ---
 
 ## Installation
 
 ```bash
-git clone https://github.com/your-username/logic-chatbot.git
+git clone git@github.com:zachealy1/prop-logic-chatbot.git
 cd logic-chatbot
 pip install sympy
 ```
 
 ## Usage
+
 Start the chatbot:
+
 ```bash
 python main.py
 ```
 
 You’ll see a prompt:
+
 ```bash
 Logic Chatbot
 Type 'exit' to quit
@@ -41,33 +44,43 @@ Type 'exit' to quit
 ## Commands
 
 ### `tell: <formula>`
+
 Add `<formula>` to the KB if it’s new and consistent.  
-**Replies:**  
-- “I already know that”  
-- “I do not believe that”  
+**Replies:**
+
+- “I already know that”
+- “I do not believe that”
 - “I’ve learned something new”
 
 ### `ask: <formula>`
+
 Query the KB.  
-**Replies:**  
-- “Yes” (entails)  
-- “No” (contradicts)  
+**Replies:**
+
+- “Yes” (entails)
+- “No” (contradicts)
 - “I do not know” (undecided)
 
 ### `list_kb`
+
 Show all formulas currently in the KB, numbered in insertion order.
 
 ### `to_cnf: <formula>`
+
 Display the original formula and its CNF equivalent.
 
 ### `truth_table: <formula>`
+
 Print the complete truth table for `<formula>`.
 
 ### `exit`
+
 Quit the chatbot.
 
 ## Example Sessions
+
 ### Tell
+
 ```bash
 Logic Chatbot
 Type 'exit' to quit
@@ -84,6 +97,7 @@ Goodbye!
 ```
 
 ### Ask
+
 ```bash
 Logic Chatbot
 Type 'exit' to quit
@@ -102,6 +116,7 @@ Goodbye!
 ```
 
 ### list_kb
+
 ```bash
 Logic Chatbot
 Type 'exit' to quit
@@ -119,6 +134,7 @@ Goodbye!
 ```
 
 ### to_cnf
+
 ```bash
 $ python main.py
 Logic Chatbot
@@ -140,6 +156,7 @@ Goodbye!
 ```
 
 ### truth_table
+
 ```bash
 $ python main.py
 Logic Chatbot
@@ -165,3 +182,49 @@ p | q | p <=> q
 > exit
 Goodbye!
 ```
+
+## Logical Laws
+
+Here are some useful propositional‐logic equivalences (“laws”) that you can test or illustrate with the chatbot. Feel
+free to experiment by using `tell:` and `ask:` on either side of each equality.
+
+1. **Commutative laws**
+    1. `p or q = q or p`
+    2. `p and q = q and p`
+
+2. **Associative laws**
+    1. `(p or q) or r = p or (q or r)`
+    2. `(p and q) and r = p and (q and r)`
+
+3. **De Morgan’s laws**
+    1. `not (p or q) = (not p) and (not q)`
+    2. `not (p and q) = (not p) or (not q)`
+
+4. **Distributive laws**
+    1. `p and (q or r) = (p and q) or (p and r)`
+    2. `p or (q and r) = (p or q) and (p or r)`
+
+5. **Negation law**
+    1. `not (not p) = p`
+
+6. **Absorption laws**
+    1. `p and (p or q) = p`
+    2. `p or (p and q) = p`
+
+7. **Laws for Tautology (Truth)**
+    1. `p or true = true`
+    2. `p and true = p`
+    3. `p or not p = true`
+
+8. **Laws for Contradiction (Falsehood)**
+    1. `p or c = p`
+    2. `p and c = c`
+    3. `p and not p = c`
+
+9. **Implication**
+    1. `p => q = (not p) or q`
+    2. `p => q = (not q) => (not p)`
+    3. `not (p => q) = p and (not q)`
+
+10. **Double Implication (Biconditional)**
+    1. `p <=> q = (p => q) and (q => p)`

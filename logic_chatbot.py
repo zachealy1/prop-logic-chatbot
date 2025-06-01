@@ -39,7 +39,7 @@ def format_formula(expr) -> str:
     Recursively turn a Sympy BoolExpr into a nicely spaced infix string:
       - uses => for Implies, <=> for Equivalent
       - & for And, | for Or
-      - ~ for Not (unary), with a space before.
+      - ~ for Not, with a space before.
       - wraps non-atomic args in parentheses with spaces.
     """
     # atomic symbol
@@ -114,8 +114,8 @@ def handle_message(message: str):
         formula = msg[len('ask:'):].strip()
         return ask(formula)
 
-    # list_kb or list kb
-    if msg in ('list_kb', 'list kb'):
+    # list_kb
+    if msg.startswith('list_kb'):
         return list_kb()
 
     # modus_ponens: <premise>; <implication>
@@ -205,11 +205,11 @@ def ask(formula_str: str) -> str:
     p = parse_formula(formula_str)
     kb_conj = And(*knowledge_base) if knowledge_base else True
 
-    # full entailment check: if KB ∧ ¬p is unsatisfiable, KB ⊨ p → Yes
+    # full entailment check
     if not satisfiable(And(kb_conj, Not(p))):
         return "Yes"
 
-    # full contradiction check: if KB ∧ p is unsatisfiable, KB ⊨ ¬p → No
+    # full contradiction check
     if not satisfiable(And(kb_conj, p)):
         return "No"
 
@@ -222,11 +222,10 @@ def ask(formula_str: str) -> str:
                 if not satisfiable(And(kb_conj, Not(antecedent))):
                     return "Yes"
 
-    # try one‐step Resolution: combine ¬p with each known clause to see if we can derive False
+    # try one‐step Resolution
     neg_p_str = f"not {formula_str}"
     for clause in knowledge_base:
         res = resolution(neg_p_str, str(clause))
-        # If resolution reports "learned: False", then KB ∪ {¬p} is unsatisfiable → KB ⊨ p
         if "learned: False" in res:
             return "Yes"
 
@@ -287,7 +286,7 @@ def modus_ponens(premise_str: str, implication_str: str) -> str:
         return f"applied modus ponens and learned: {consequent}"
     elif res == "I already know that":
         return f"applied modus ponens but I already know that: {consequent}"
-    else:  # "I do not believe that"
+    else:
         return f"I do not believe that: {consequent}"
 
 
@@ -302,14 +301,14 @@ def resolution(clause1_str: str, clause2_str: str) -> str:
     def literals(cl):
         return list(cl.args) if cl.func is Or else [cl]
 
-    lits1 = literals(c1)
-    lits2 = literals(c2)
+    literal1 = literals(c1)
+    literal2 = literals(c2)
 
-    for e1 in lits1:
-        for e2 in lits2:
+    for e1 in literal1:
+        for e2 in literal2:
             if e1 == Not(e2) or Not(e1) == e2:
                 # form the union of the remaining literals
-                new_list = [x for x in lits1 if x != e1] + [x for x in lits2 if x != e2]
+                new_list = [x for x in literal1 if x != e1] + [x for x in literal2 if x != e2]
 
                 # dedupe while preserving order
                 uniq = []
