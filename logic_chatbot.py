@@ -176,7 +176,7 @@ def tell(formula_str: str) -> str:
     # otherwise, accept the new fact
     knowledge_base.append(p)
 
-    # --- forward chaining: look for any immediate Modus Ponens inferences ---
+    # forward chaining: look for any immediate Modus Ponens inferences
     for imp in list(knowledge_base):
         if imp.func is Implies:
             ante, cons = imp.args
@@ -184,7 +184,7 @@ def tell(formula_str: str) -> str:
             if p == ante:
                 _ = modus_ponens(formula_str, str(imp))
 
-    # --- resolution with the new clause against all others ---
+    # resolution with the new clause against all others
     for clause in list(knowledge_base):
         _ = resolution(formula_str, str(clause))
         _ = resolution(str(clause), formula_str)
@@ -205,29 +205,32 @@ def ask(formula_str: str) -> str:
     p = parse_formula(formula_str)
     kb_conj = And(*knowledge_base) if knowledge_base else True
 
-    # direct lookup
-    if p in knowledge_base:
+    # full entailment check: if KB ∧ ¬p is unsatisfiable, KB ⊨ p → Yes
+    if not satisfiable(And(kb_conj, Not(p))):
         return "Yes"
 
-    # try Modus Ponens: do we have A->p and A holds?
-    for imp in knowledge_base:
-        if imp.func is Implies:
-            ante, cons = imp.args
-            if cons == p and not satisfiable(And(kb_conj, Not(ante))):
-                return "Yes"
-
-    # one–step resolution on ¬p against each clause
-    neg_p_str = f"¬({formula_str})"
-    for clause in knowledge_base:
-        res = resolution(neg_p_str, str(clause))
-        # if we derive the empty clause (false), KB ∪ {¬p} is inconsistent → KB ⊨ p
-        if "learned: False" in res:
-            return "Yes"
-
-    # check outright contradiction with p
+    # full contradiction check: if KB ∧ p is unsatisfiable, KB ⊨ ¬p → No
     if not satisfiable(And(kb_conj, p)):
         return "No"
 
+    # try one‐step Modus Ponens
+    for imp in knowledge_base:
+        if imp.func is Implies:
+            antecedent, consequent = imp.args
+            if consequent == p:
+                # does KB entail the antecedent?
+                if not satisfiable(And(kb_conj, Not(antecedent))):
+                    return "Yes"
+
+    # try one‐step Resolution: combine ¬p with each known clause to see if we can derive False
+    neg_p_str = f"not {formula_str}"
+    for clause in knowledge_base:
+        res = resolution(neg_p_str, str(clause))
+        # If resolution reports "learned: False", then KB ∪ {¬p} is unsatisfiable → KB ⊨ p
+        if "learned: False" in res:
+            return "Yes"
+
+    # if none of the above conditions triggered, we cannot decide
     return "I do not know"
 
 
