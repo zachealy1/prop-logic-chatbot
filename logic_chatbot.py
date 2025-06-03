@@ -14,6 +14,7 @@ def parse_formula(text: str):
     """
     Parse a propositional‐logic string into a Sympy Boolean expression,
     mapping our keywords to the right Sympy constructors.
+    Raises ValueError if parsing fails.
     """
     input_str = text.strip()
 
@@ -21,17 +22,21 @@ def parse_formula(text: str):
     input_str = re.sub(r'\bimplies\b', '>>', input_str)
     input_str = re.sub(r'\band\b', '&', input_str)
     input_str = re.sub(r'\bor\b', '|', input_str)
-    input_str = re.sub(r'\bnot\s+', '~', input_str)
+    input_str = re.sub(r'\bnot\b\s*', '~', input_str)
 
     # handle “iff” by turning it into an Explicit call
     if 'iff' in input_str:
         left_part, right_part = input_str.split('iff', 1)
         input_str = f"Equivalent({left_part.strip()}, {right_part.strip()})"
-    # now parse a valid Python expression
-    return parse_expr(
-        input_str,
-        local_dict={'Implies': Implies, 'Equivalent': Equivalent}
-    )
+
+    # now parse a valid Python expression, catching any errors
+    try:
+        return parse_expr(
+            input_str,
+            local_dict={'Implies': Implies, 'Equivalent': Equivalent}
+        )
+    except Exception as e:
+        raise ValueError("Invalid formula syntax") from e
 
 
 def format_formula(expr) -> str:
@@ -103,17 +108,26 @@ def handle_message(message: str):
     # truth_table: <formula>
     if msg.startswith('truth_table:'):
         formula_part = msg[len('truth_table:'):].strip()
-        return truth_table(formula_part)
+        try:
+            return truth_table(formula_part)
+        except ValueError:
+            return "Invalid formula syntax. Please try again."
 
     # tell: <formula>
     if msg.startswith('tell:'):
         formula_part = msg[len('tell:'):].strip()
-        return tell(formula_part)
+        try:
+            return tell(formula_part)
+        except ValueError:
+            return "Invalid formula syntax. Please try again."
 
     # ask: <formula>
     if msg.startswith('ask:'):
         formula_part = msg[len('ask:'):].strip()
-        return ask(formula_part)
+        try:
+            return ask(formula_part)
+        except ValueError:
+            return "Invalid formula syntax. Please try again."
 
     # list_kb
     if msg.startswith('list_kb'):
@@ -126,7 +140,10 @@ def handle_message(message: str):
         if len(parts) != 2:
             return "Invalid syntax. Use: modus_ponens: <premise>; <implication>"
         premise_expr_str, implication_expr_str = parts[0].strip(), parts[1].strip()
-        return modus_ponens(premise_expr_str, implication_expr_str)
+        try:
+            return modus_ponens(premise_expr_str, implication_expr_str)
+        except ValueError:
+            return "Invalid formula syntax. Please try again."
 
     # resolution: <clause1>; <clause2>
     if msg.startswith('resolution:'):
@@ -135,12 +152,18 @@ def handle_message(message: str):
         if len(parts) != 2:
             return "Invalid syntax. Use: resolution: <clause1>; <clause2>"
         clause1_str, clause2_str = parts[0].strip(), parts[1].strip()
-        return resolution(clause1_str, clause2_str)
+        try:
+            return resolution(clause1_str, clause2_str)
+        except ValueError:
+            return "Invalid formula syntax. Please try again."
 
     # to_cnf: <formula>
     if msg.startswith('to_cnf:'):
         formula_part = msg[len('to_cnf:'):].strip()
-        return convert_to_cnf(formula_part)
+        try:
+            return convert_to_cnf(formula_part)
+        except ValueError:
+            return "Invalid formula syntax. Please try again."
 
     # nothing matched
     return "Unknown command. Please use tell:, ask:, list_kb, modus_ponens:, resolution:, to_cnf: or exit."
