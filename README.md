@@ -222,10 +222,10 @@ free to experiment by using `tell:` and `ask:` on either side of each equality.
     2. `p or (p and q) = p`
 
 7. **Implication**
-    1. `p => q = (not p) or q`
-    2. `p => q = (not q) => (not p)`
-    3. `not (p => q) = p and (not q)`
+    1. `p implies q = (not p) or q`
+    2. `p implies q = (not q) implies (not p)`
+    3. `not (p implies q) = p and (not q)`
    
 8. **Double Implication (Biconditional)**
-    1. `p <=> q = (p => q) and (q => p)`
+    1. `p iff q = (p implies q) and (q implies p)`
 
