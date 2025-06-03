@@ -46,45 +46,45 @@ Type 'exit' to quit
 ### `tell: <formula>`  
 Add `<formula>` to the KB if it’s new and consistent.  
 **Replies:**  
-- “I already know that”  
-- “I do not believe that”  
-- “I’ve learned something new” :contentReference[oaicite:0]{index=0}
+- "I already know that"  
+- "I do not believe that"  
+- "I’ve learned something new"
 
 ### `ask: <formula>`  
 Query the KB.  
 **Replies:**  
-- “Yes” (entails)  
-- “No” (contradicts)  
-- “I do not know” (undecided) :contentReference[oaicite:1]{index=1}
+- "Yes" (entails)  
+- "No" (contradicts)  
+- "I do not know" (undecided) 
 
 ### `list_kb`  
-Show all formulas currently in the KB, numbered in insertion order. :contentReference[oaicite:2]{index=2}
+Show all formulas currently in the KB, numbered in insertion order. 
 
 ### `modus_ponens: <premise>; <implication>`  
 Apply Modus Ponens: if `<premise>` matches the antecedent of `<implication>` (which must be of the form `p implies q`), learn `q`.  
 **Replies:**  
-- “applied modus ponens and learned: <consequent>”  
-- “applied modus ponens, but I already know that: <consequent>”  
-- “I do not believe that: <consequent>”  
-- “Error: second argument must be an implication.”  
-- “Error: premise `<premise>` does not match implication antecedent `<antecedent>`.” 
+- "applied modus ponens and learned: <consequent>"  
+- "applied modus ponens, but I already know that: <consequent>"  
+- "I do not believe that: <consequent>"  
+- "Error: second argument must be an implication."  
+- "Error: premise `<premise>` does not match implication antecedent `<antecedent>`." 
 
 ### `resolution: <clause1>; <clause2>`  
 Apply one‐step resolution between two clauses (each a disjunction of literals). If a complementary pair is found, learn the resolvent.  
 **Replies:**  
-- “applied resolution and learned: <resolvent>”  
-- “applied resolution, but it’s already in the KB: <resolvent>”  
-- “No complementary literals found; resolution not applicable.”  
-- “Invalid syntax. Use: resolution: <clause1>; <clause2>” 
+- "applied resolution and learned: <resolvent>"  
+- "applied resolution, but it’s already in the KB: <resolvent>"  
+- "No complementary literals found; resolution not applicable."  
+- "Invalid syntax. Use: resolution: <clause1>; <clause2>" 
 
 ### `to_cnf: <formula>`  
-Display the original formula and its CNF equivalent. :contentReference[oaicite:5]{index=5}
+Display the original formula and its CNF equivalent.
 
 ### `truth_table: <formula>`  
-Print the complete truth table for `<formula>`. :contentReference[oaicite:6]{index=6}
+Print the complete truth table for `<formula>`.
 
 ### `exit`  
-Quit the chatbot. :contentReference[oaicite:7]{index=7}
+Quit the chatbot.
 
 
 ## Example Sessions
@@ -195,7 +195,7 @@ Goodbye!
 
 ## Logical Laws
 
-Here are some useful propositional‐logic equivalences (“laws”) that you can test or illustrate with the chatbot. Feel
+Here are some useful propositional‐logic equivalences ("laws") that you can test or illustrate with the chatbot. Feel
 free to experiment by using `tell:` and `ask:` on either side of each equality.
 
 1. **Commutative laws**
